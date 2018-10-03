@@ -1,3 +1,7 @@
+# Executables and binaries
+build/*
+beep
+
 # Prerequisites
 *.d
 
