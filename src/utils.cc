@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdarg>
+#include <ctime>
 
 #include <string>
 #include <vector>
@@ -47,5 +48,13 @@ namespace utils {
     va_end(args);
     printf("\n  > %s\n", irc_strerror(e));
     return e;
+  }
+
+  /* Array functions */
+
+  /* String functions */
+
+  std::string StripUsername(std::string user) {
+    return user.substr(0, user.find("!"));
   }
 }

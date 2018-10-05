@@ -23,7 +23,7 @@ DEPS = $(OBJS:.o=.d)
 
 # Flags
 WARN_FLAGS = -Wall -Wextra -Wshadow -Wfloat-equal -Wwrite-strings -Wswitch-default \
-						 -Wunreachable-code -Wno-unused-parameter
+						 -Wunreachable-code -Wno-unused-parameter -Wno-unused-function
 COMP_FLAGS = $(WARN_FLAGS) -std=c++11 -g
 INCLUDES = -I include/ -I /usr/include/libircclient
 LDLIBS = -lm -lircclient -lcrypto -lssl

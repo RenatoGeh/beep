@@ -41,6 +41,16 @@ namespace utils {
   template<typename T> void Erase(std::vector<T> &a, T e) {
     a.erase(std::remove(a.begin(), a.end(), e), a.end());
   }
+
+  /* String functions */
+
+  // StripUsername strips a libircclient user string to only the relevant username string.
+  std::string StripUsername(std::string user);
+
+  /* Date and time functions */
+
+  // FormatDate returns the current date and time string according to the given format.
+  std::string FormatDate(std::string fmt);
 }
 
 #endif
