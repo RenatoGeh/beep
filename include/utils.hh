@@ -2,6 +2,7 @@
 #define _UTILS_HH
 
 #include <vector>
+#include <string>
 
 #include "libircclient.h"
 
@@ -46,6 +47,9 @@ namespace utils {
 
   // StripUsername strips a libircclient user string to only the relevant username string.
   std::string StripUsername(std::string user);
+
+  // Sprintf is a C++11 std::string sprintf equivalent.
+  std::string Sprintf(const std::string &fmt_str, ...);
 
   /* Date and time functions */
 

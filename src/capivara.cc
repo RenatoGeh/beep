@@ -11,8 +11,6 @@
 
 #include "capivara.hh"
 
-const std::vector<std::string> COMMANDS = {"!help", "!lastseen"};
-
 Capivara::Capivara(void) : Bot("capivara") {
   io::Mkdir("capivara");
   logs = new Backlog("capivara/backlog.txt", 100);
@@ -23,7 +21,6 @@ Capivara::~Capivara(void) {
 }
 
 void Capivara::OnConnect(void) {
-
 }
 
 void Capivara::OnMessage(std::string user, std::string channel, std::string text) {

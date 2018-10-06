@@ -8,13 +8,8 @@
 
 #include "backlog.hh"
 
-Backlog::Backlog(std::string filename, unsigned int c) : size(0), cap(c) {
-  fdisk = io::Open(filename, "+a");
-}
-
-Backlog::~Backlog(void) {
-  delete fdisk;
-}
+Backlog::Backlog(std::string filename, unsigned int c) : InstantLog(filename), size(0), cap(c) {}
+Backlog::~Backlog(void) {}
 
 unsigned int Backlog::Log(std::string user, const std::string &text) {
   user.assign(utils::StripUsername(user));

@@ -4,9 +4,13 @@
 #include <list>
 #include <string>
 
+#include "instant_log.hh"
 #include "io.hh"
 
-class Backlog {
+// Backlog logs text messages to a file on disk. When a certain amount of messages have been
+// received, it flushes the stream, writing on disk. Until it reaches such a limit, or is manually
+// forced to flush, messages are logged in memory.
+class Backlog : private InstantLog {
   public:
     Backlog(std::string filename, unsigned int c);
     Backlog(void) = delete;
@@ -20,8 +24,8 @@ class Backlog {
 
     // Flush flushes
     void Flush(void);
+
   private:
-    io::File *fdisk;
     std::list<std::string> log;
     std::list<std::string> last_log;
     unsigned int size;
