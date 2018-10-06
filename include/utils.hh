@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "libircclient.h"
 
@@ -50,6 +51,28 @@ namespace utils {
 
   // Sprintf is a C++11 std::string sprintf equivalent.
   std::string Sprintf(const std::string &fmt_str, ...);
+
+  namespace {
+    template<typename T> auto convert_str(T&& t) {
+      if constexpr(std::is_same<std::remove_cv_t<std::remove_reference_t<T>>, std::string>::value)
+        return std::forward<T>(t).c_str();
+      else
+        return std::forward<T>(t);
+    }
+
+    template<typename ... Args> std::string sprintf_internal(
+        const std::string& format, Args&& ... args) {
+      size_t size = snprintf(nullptr, 0, format.c_str(), std::forward<Args>(args) ...) + 1;
+      std::unique_ptr<char[]> buf(new char[size]);
+      snprintf(buf.get(), size, format.c_str(), args ...);
+      return std::string(buf.get(), buf.get() + size - 1);
+    }
+  }
+
+  // Sprintf is a C++11 std::string sprintf equivalent.
+  template<typename ... Args> std::string Sprintf(std::string fmt, Args&& ... args) {
+    return sprintf_internal(fmt, convert_str(std::forward<Args>(args))...);
+  }
 
   /* Date and time functions */
 
