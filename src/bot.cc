@@ -78,15 +78,27 @@ int Bot::Start(void) {
 }
 
 int Bot::Say(std::string msg, std::string channel) {
+  if (msg == "") return -1;
   if (irc_cmd_msg(session, channel.c_str(), msg.c_str()))
     return utils::PrintfError(session, "Could not send message to channel [%s].", channel.c_str());
   return 0;
 }
 
 int Bot::Whisper(std::string msg, std::string user) {
+  if (msg == "") return -1;
   if (irc_cmd_msg(session, user.c_str(), msg.c_str()))
     return utils::PrintfError(session, "Could not send private message to user [%s].", user.c_str());
   return 0;
+}
+
+int Bot::Broadcast(std::string msg) {
+  if (msg == "") return -1;
+  int s = 0;
+  for (auto it = channels.begin(); it != channels.end(); ++it) {
+    int r = Say(msg, *it);
+    if (r) s = r;
+  }
+  return s;
 }
 
 int Bot::Part(std::string channel) {

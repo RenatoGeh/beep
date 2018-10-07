@@ -7,20 +7,19 @@
 
 namespace cmd {
   std::string Help::Do(const std::vector<std::string> &params) {
-    if (params.size() == 0) {
-      std::string out;
-      out.append(prep + "\nThe following is a list of available commands:\n");
+    if (params.size() == 3) {
+      std::string out = prep + "The following is a list of available commands:";
       for (auto it = cmds.begin(); it != cmds.end(); ++it) {
         Command *c = *it;
-        out.append("  " + c->Name() + " - " + c->Description());
+        out.append(" " + c->Tag());
       }
       return out;
     }
 
-    std::string f = params[0];
+    std::string f = params[3];
     for (auto it = cmds.begin(); it != cmds.end(); ++it) {
       Command *c = *it;
-      if (c->Name() == f) return c->Help();
+      if (c->Tag() == f) return c->Help();
     }
     return utils::Sprintf("Command [%s] does not exist.", f);
   }

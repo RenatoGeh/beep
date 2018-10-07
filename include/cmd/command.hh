@@ -12,6 +12,7 @@ namespace cmd {
               const std::string &h, const std::string &d) :
         name(n), tag(t), help(h), desc(d) {}
       Command(void) = delete;
+      virtual ~Command(void) {}
 
       const std::string& Name(void) { return name; }
       const std::string& Tag(void) { return tag; }

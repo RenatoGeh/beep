@@ -49,9 +49,6 @@ namespace utils {
   // StripUsername strips a libircclient user string to only the relevant username string.
   std::string StripUsername(std::string user);
 
-  // Sprintf is a C++11 std::string sprintf equivalent.
-  std::string Sprintf(const std::string &fmt_str, ...);
-
   namespace {
     template<typename T> auto convert_str(T&& t) {
       if constexpr(std::is_same<std::remove_cv_t<std::remove_reference_t<T>>, std::string>::value)
@@ -73,6 +70,8 @@ namespace utils {
   template<typename ... Args> std::string Sprintf(std::string fmt, Args&& ... args) {
     return sprintf_internal(fmt, convert_str(std::forward<Args>(args))...);
   }
+
+  std::vector<std::string> Tokenize(std::string s);
 
   /* Date and time functions */
 

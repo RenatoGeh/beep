@@ -12,10 +12,12 @@ namespace io {
   File::File(FILE *fd, std::string fname, std::string md) {
     f = fd;
     filename.assign(fname);
-    md.assign(md);
+    mode.assign(md);
   }
 
-  File::~File(void) { fclose(f); }
+  File::~File(void) {
+    if (f != NULL) fclose(f);
+  }
 
   File *Open(std::string filename, std::string mode) {
     FILE *fd = fopen(filename.c_str(), mode.c_str());
@@ -36,17 +38,17 @@ namespace io {
     f = NULL;
   }
 
+  void File::Write(const std::string &text) {
+    fprintf(f, "%s", text.c_str());
+  }
+
+  void File::Clear() {
+    freopen(NULL, "w", f);
+    freopen(NULL, mode.c_str(), f);
+  }
+
   void Close(File *f) {
     delete f;
-  }
-
-  void Write(File *f, const std::string &text) {
-    fprintf(f->f, "%s", text.c_str());
-  }
-
-  void Clear(File *f) {
-    freopen(NULL, "w", f->f);
-    freopen(NULL, f->mode.c_str(), f->f);
   }
 
   void Mkdir(std::string dir) {

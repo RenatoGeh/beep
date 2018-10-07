@@ -30,7 +30,7 @@ void Backlog::Flush(void) {
   puts("LOG: Flushed backlog.");
   last_log.clear();
   for (auto it = log.begin(); it != log.end(); ++it)
-    io::Write(fdisk, *it);
+    fdisk->Write(*it);
   last_log.splice(last_log.begin(), log);
   size = 0;
   fdisk->Close();

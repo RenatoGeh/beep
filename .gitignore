@@ -1,6 +1,9 @@
 # Vim
 Session.vim
 
+# Logs
+capivara/
+
 # Executables and binaries
 build/*
 beep

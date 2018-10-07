@@ -18,14 +18,11 @@ class InstantLog {
     virtual unsigned int Log(std::string user, const std::string &text);
 
     // Flush flushes the contents of _log into fdisk.
-    virtual void Flush(void);
+    virtual void Flush(void) {}
 
   protected:
     io::File *fdisk;
     std::string fname;
-
-  private:
-    std::string _log;
 };
 
 #endif

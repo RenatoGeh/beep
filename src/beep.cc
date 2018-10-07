@@ -6,14 +6,14 @@
 #include "libirc_rfcnumeric.h"
 
 #include "bot.hh"
-#include "echo.hh"
+#include "capivara.hh"
 
 int main(void) {
-  EchoBot b("CCSLTestBot");
+  Capivara b;
   Bot::Assign(&b);
 
   puts("Connecting...");
-  b.Connect("irc.freenode.net");
+  b.Connect();
   puts("Starting...");
   b.Start();
   puts("Goodbye.");

@@ -94,7 +94,7 @@ class Bot {
     //   LIBIRC_RFC_ERR_WILDTOPLEVEL
     //   LIBIRC_RFC_ERR_TOOMANYTARGETS
     //   LIBIRC_RFC_ERR_NOSUCHNICK
-    int Say(std::string msg, std::string channel);
+    virtual int Say(std::string msg, std::string channel);
 
     // Whisper sends a private message to a user.
     // If succeeded, then either no event is triggered or:
@@ -108,7 +108,10 @@ class Bot {
     //   LIBIRC_RFC_ERR_WILDTOPLEVEL
     //   LIBIRC_RFC_ERR_TOOMANYTARGETS
     //   LIBIRC_RFC_ERR_NOSUCHNICK
-    int Whisper(std::string msg, std::string user);
+    virtual int Whisper(std::string msg, std::string user);
+
+    // Broadcast sends a message to all channels this bot has joined.
+    virtual int Broadcast(std::string msg);
 
     // Part causes the bot to attempt to leave a channel.
     //   LIBIRC_RFC_ERR_NOSUCHCHANNEL
@@ -171,10 +174,6 @@ class Bot {
     // Bot destructor.
     virtual ~Bot(void);
 
-  private:
-    // Singleton
-    static Bot* bot_inst;
-
     // Fields
     std::string name;
     std::string server;
@@ -184,6 +183,10 @@ class Bot {
 
     unsigned int event_code;
     bool running;
+  private:
+    // Singleton
+    static Bot* bot_inst;
+
 
     irc_callbacks_t callbacks;
     irc_session_s *session;

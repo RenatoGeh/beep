@@ -8,6 +8,8 @@
 #include <memory>
 #include <algorithm>
 
+#include "boost/tokenizer.hpp"
+
 #include "libircclient.h"
 
 #include "utils.hh"
@@ -58,5 +60,14 @@ namespace utils {
 
   std::string StripUsername(std::string user) {
     return user.substr(0, user.find("!"));
+  }
+
+  std::vector<std::string> Tokenize(std::string s) {
+    boost::char_separator<char> sep(" ");
+    boost::tokenizer<boost::char_separator<char>> t(s, sep);
+    std::vector<std::string> l;
+    for (auto it = t.begin(); it != t.end(); ++it)
+      l.push_back(*it);
+    return l;
   }
 }

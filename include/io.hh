@@ -18,6 +18,13 @@ namespace io {
       // Close closes the stream, but can be reopened with Open.
       void Close(void);
 
+      // Write writes a string to a file according to its set mode.
+      void Write(const std::string &text);
+
+      // Clear erases the file's content.
+      void Clear(void);
+
+    private:
       FILE *f;
       std::string filename;
       std::string mode;
@@ -28,12 +35,6 @@ namespace io {
 
   // Closes a file.
   void Close(File *f);
-
-  // Write writes a string to a file according to its set mode.
-  void Write(File *f, const std::string &text);
-
-  // Clear erases the file's content.
-  void Clear(File *f);
 
   // Create creates a given directory. If dir already exists, does nothing.
   void Mkdir(std::string dir);
