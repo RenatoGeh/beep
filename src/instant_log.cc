@@ -8,14 +8,14 @@ InstantLog::InstantLog(std::string filename) : fname(filename) {
 }
 
 InstantLog::~InstantLog(void) {
-  delete fdisk;
+  io::Close(fdisk);
 }
 
 unsigned int InstantLog::Log(std::string user, const std::string &text) {
   user.assign(utils::StripUsername(user));
   std::string line = (user + " | ") + text;
   fdisk->Open();
-  fdisk->Write(line);
+  fdisk->WriteLine(line);
   fdisk->Close();
-  return 0;
+  return line.size();
 }

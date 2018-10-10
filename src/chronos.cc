@@ -23,6 +23,8 @@ namespace {
 namespace chronos {
   Time::Time(void) { time(&raw); }
 
+  Time::Time(std::string stime) { Import(stime); }
+
   std::string Time::Format(std::string fmt) {
     char buf[256];
     strftime(buf, 256, fmt.c_str(), gmtime(&raw));
@@ -31,6 +33,18 @@ namespace chronos {
 
   double Time::operator-(const Time &t) {
     return difftime(raw, t.raw);
+  }
+
+  void Time::Import(std::string stime) {
+    struct tm stamp;
+    strptime(stime.c_str(), "%F %T", &stamp);
+    raw = mktime(&stamp);
+  }
+
+  std::string Time::Export(void) {
+    char buf[32];
+    strftime(buf, sizeof(buf), "%F %T", gmtime(&raw));
+    return std::string(buf);
   }
 
   std::string DiffString(double du) {
