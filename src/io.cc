@@ -34,7 +34,6 @@ namespace io {
       f = fopen(filename.c_str(), mode.c_str());
   }
 
-
   bool File::Touch(void) {
     FILE *fd = fopen(filename.c_str(), "r");
     if (fd == NULL) {
@@ -46,6 +45,15 @@ namespace io {
       return false;
     }
     return true;
+  }
+
+  bool File::Empty(void) {
+    if (f == NULL)
+      this->Open("r");
+    fseek(f, 0, SEEK_END);
+    bool rval = ftell(f) == 0;
+    this->Close();
+    return rval;
   }
 
   void File::Open(std::string md) {
@@ -111,7 +119,8 @@ namespace io {
       return END;
     }
     char *buf = NULL;
-    int n = getline(&buf, NULL, f);
+    size_t len = 0;
+    int n = getline(&buf, &len, f);
     if (n == END) {
       free(buf);
       return n;

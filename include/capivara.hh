@@ -6,6 +6,7 @@
 #include "bot.hh"
 #include "io.hh"
 #include "backlog.hh"
+#include "userbase.hh"
 #include "cmd/listener.hh"
 #include "cmd/leave.hh"
 
@@ -30,6 +31,7 @@ class Capivara : public Bot {
   private:
     Backlog *logs;
     InstantLog *debug;
+    UserBase *db;
 
     cmd::Listener *listener;
     cmd::Leave *leave;

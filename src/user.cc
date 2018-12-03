@@ -17,18 +17,18 @@ User::~User(void) {
 }
 
 void User::Login(void) {
-  if (!fdisk->Touch())
+  if (fdisk->Empty())
     Initialize();
   fdisk->Open("r");
   std::string line;
-  fdisk->Read(&line);
+  int n = fdisk->Read(&line);
   last_seen.Import(line);
-  int n = 0;
   const int END = std::char_traits<char>::eof();
-  do {
-    fdisk->Read(&line);
+  while (n != END) {
+    n = fdisk->Read(&line);
+    if (n == END) break;
     quotes.push_back(line);
-  } while (n != END);
+  }
   fdisk->Close();
 }
 

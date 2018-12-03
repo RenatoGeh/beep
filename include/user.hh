@@ -25,6 +25,11 @@ class User : protected InstantLog {
 
     bool Logged(void) { return logged; }
 
+    std::string LastSeen(void) {
+      chronos::Time t;
+      return chronos::DiffString(last_seen, t);
+    }
+
   private:
     std::string name;
     bool logged;

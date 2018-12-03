@@ -42,6 +42,9 @@ namespace io {
       // not alter the timestamp on the file. Returns whether the file existed already.
       bool Touch(void);
 
+      // Empty checks if a file is empty.
+      bool Empty(void);
+
       // Clear erases the file's content.
       void Clear(void);
 
