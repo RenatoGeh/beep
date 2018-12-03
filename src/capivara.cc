@@ -7,7 +7,7 @@
 #include "libirc_rfcnumeric.h"
 
 #include "bot.hh"
-#include "backlog.hh"
+#include "instant_log.hh"
 #include "utils.hh"
 #include "io.hh"
 
@@ -16,17 +16,23 @@
 #include "cmd/echo.hh"
 #include "cmd/leave.hh"
 #include "cmd/lastseen.hh"
+#include "cmd/register.hh"
 
 #include "capivara.hh"
 
 Capivara::Capivara(void) : Bot("capivara") {
   io::Mkdir("capivara");
-  logs = new Backlog("capivara/backlog.txt", 100);
+  logs = new InstantLog("capivara/backlog.txt");
   debug = new InstantLog("capivara/debug.txt");
   db = new UserBase("capivara/users");
 
   leave = new cmd::Leave();
-  cmd::Help *h = new cmd::Help({new cmd::Echo(), leave, new cmd::LastSeen(db)});
+  cmd::Help *h = new cmd::Help({
+      new cmd::Echo(),
+      leave,
+      new cmd::LastSeen(db),
+      new cmd::Register(db)
+  });
   listener = new cmd::Listener(h->Commands());
 }
 

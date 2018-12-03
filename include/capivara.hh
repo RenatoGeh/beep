@@ -29,7 +29,7 @@ class Capivara : public Bot {
     ~Capivara(void);
 
   private:
-    Backlog *logs;
+    InstantLog *logs;
     InstantLog *debug;
     UserBase *db;
 

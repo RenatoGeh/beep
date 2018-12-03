@@ -32,6 +32,9 @@ namespace chronos {
 
   // DiffString returns a string representation of a duration t-s.
   inline std::string DiffString(const Time &s, Time &t) { return DiffString(t-s); }
+
+  // Now returns the time right now in string format.
+  std::string Now(void);
 }
 
 #endif

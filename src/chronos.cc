@@ -27,7 +27,7 @@ namespace chronos {
 
   std::string Time::Format(std::string fmt) {
     char buf[256];
-    strftime(buf, 256, fmt.c_str(), gmtime(&raw));
+    strftime(buf, 256, fmt.c_str(), localtime(&raw));
     return std::string(buf);
   }
 
@@ -43,7 +43,7 @@ namespace chronos {
 
   std::string Time::Export(void) {
     char buf[32];
-    strftime(buf, sizeof(buf), "%F %T", gmtime(&raw));
+    strftime(buf, sizeof(buf), "%F %T", localtime(&raw));
     return std::string(buf);
   }
 
@@ -53,11 +53,18 @@ namespace chronos {
     bool neg = du < 0;
     for (int i = 0; i < N_SECS; ++i) {
       int u = t/SECS[i];
-      t -= u;
+      t -= u*SECS[i];
       char buf[64] = "";
       sprintf(buf, "%d %s%s", u, SECS_S[i], (i != N_SECS-1) ? ", " :  (neg ? " ago" : ""));
       strcat(rep, buf);
     }
     return std::string(rep);
+  }
+
+  std::string Now(void) {
+    time_t now = time(NULL);
+    char buf[32];
+    strftime(buf, sizeof(buf), "%F %T", localtime(&now));
+    return std::string(buf);
   }
 }
