@@ -17,6 +17,7 @@
 #include "cmd/leave.hh"
 #include "cmd/lastseen.hh"
 #include "cmd/register.hh"
+#include "cmd/smiley.hh"
 
 #include "capivara.hh"
 
@@ -31,7 +32,8 @@ Capivara::Capivara(void) : Bot("capivara") {
       new cmd::Echo(),
       leave,
       new cmd::LastSeen(db),
-      new cmd::Register(db)
+      new cmd::Register(db),
+      new cmd::Smiley(),
   });
   listener = new cmd::Listener(h->Commands());
 }
