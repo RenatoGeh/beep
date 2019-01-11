@@ -6,11 +6,14 @@
 
 #include "cmd/command.hh"
 
+#ifndef _CMD_LEAVE_KEY_SIZE
+#define _CMD_LEAVE_KEY_SIZE 6
+#endif
+
 namespace cmd {
   class Leave : public Command {
     public:
-      Leave(void) : Command("leave", "!leave", "This command forces the bot to disconnect.",
-          "disconnects the bot"), trigger(false) {}
+      Leave(void);
       ~Leave(void) {}
 
       std::string Do(const std::vector<std::string> &params);
@@ -18,6 +21,7 @@ namespace cmd {
       bool Check(void) { return trigger; }
     private:
       bool trigger;
+      char pw[_CMD_LEAVE_KEY_SIZE];
   };
 }
 
