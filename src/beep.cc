@@ -2,9 +2,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "libircclient.h"
-#include "libirc_rfcnumeric.h"
-
 #include "bot.hh"
 #include "capivara.hh"
 
