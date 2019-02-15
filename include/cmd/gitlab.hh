@@ -6,6 +6,7 @@
 
 #include <curl/curl.h>
 
+#include "chronos.hh"
 #include "cmd/command.hh"
 
 namespace cmd {
@@ -25,9 +26,11 @@ namespace cmd {
         size_t size;
       } buffer;
 
+      chronos::Time last_update;
+
       static size_t write_data(void *contents, size_t size, size_t nmemb, void *userp);
 
-      std::string do_issue(const std::vector<std::string> &params);
+      std::string do_any(std::string t, const std::vector<std::string> &params);
   };
 }
 
