@@ -70,4 +70,9 @@ namespace utils {
       l.push_back(*it);
     return l;
   }
+
+  std::string toupper(std::string &s) {
+    boost::to_upper(s);
+    return s;
+  }
 }

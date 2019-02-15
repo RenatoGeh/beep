@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 
+#include <boost/algorithm/string.hpp>
+
 #include "libircclient.h"
 
 namespace utils {
@@ -72,6 +74,8 @@ namespace utils {
   }
 
   std::vector<std::string> Tokenize(std::string s, std::string sep_str = " ");
+
+  std::string toupper(std::string &s);
 
   /* Date and time functions */
 
