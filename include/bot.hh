@@ -183,10 +183,10 @@ class Bot {
 
     unsigned int event_code;
     bool running;
+
   private:
     // Singleton
     static Bot* bot_inst;
-
 
     irc_callbacks_t callbacks;
     irc_session_s *session;

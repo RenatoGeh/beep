@@ -79,8 +79,14 @@ int Bot::Start(void) {
 
 int Bot::Say(std::string msg, std::string channel) {
   if (msg == "") return -1;
-  if (irc_cmd_msg(session, channel.c_str(), msg.c_str()))
+  if (irc_cmd_msg(session, channel.c_str(), msg.c_str())) {
+    int e = irc_errno(session);
+    if (e == LIBIRC_ERR_NOMEM) {
+      utils::PrintError("Command queue full. Ignoring...");
+      return e;
+    }
     return utils::PrintfError(session, "Could not send message to channel [%s].", channel.c_str());
+  }
   return 0;
 }
 
