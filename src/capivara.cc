@@ -19,6 +19,7 @@
 #include "cmd/register.hh"
 #include "cmd/smiley.hh"
 #include "cmd/substitute.hh"
+#include "cmd/gitlab.hh"
 
 #include "capivara.hh"
 
@@ -36,6 +37,7 @@ Capivara::Capivara(void) : Bot("capivara") {
       new cmd::Register(db),
       new cmd::Smiley(),
       new cmd::Substitute(logs),
+      new cmd::GitLab("3482579"),
   });
   listener = new cmd::Listener(h->Commands());
 }
@@ -68,7 +70,9 @@ void Capivara::OnConnect(void) {
 void Capivara::OnMessage(std::string user, std::string channel, std::string text) {
   logs->Log(user, text);
   printf("User: %s, Channel: %s, Text: %s\n", user.c_str(), channel.c_str(), text.c_str());
-  Say(listener->Listen(user, channel, text), channel);
+  std::vector<std::string> v = utils::Tokenize(listener->Listen(user, channel, text), "\n");
+  for (auto it = v.begin(); it != v.end(); ++it)
+    Say(*it, channel);
   if (leave->Check()) Disconnect();
 }
 
