@@ -9,23 +9,25 @@
 
 #include "cmd/substitute.hh"
 
-int split_query(std::string q, std::string *pat, std::string *rep) {
-  int i = 0;
-  for (auto it = q.begin(); it != q.end(); ++it, ++i)
-    if (*it == '/' && it != q.begin() && *(it-1) != '\\') {
-      *pat = "\\b" + q.substr(0, i);
-      *rep = q.substr(i+1);
-      return 0;
-    }
-  return rep->empty() ? -1 : -2;
-}
+namespace {
+  int split_query(std::string q, std::string *pat, std::string *rep) {
+    int i = 0;
+    for (auto it = q.begin(); it != q.end(); ++it, ++i)
+      if (*it == '/' && it != q.begin() && *(it-1) != '\\') {
+        *pat = "\\b" + q.substr(0, i);
+        *rep = q.substr(i+1);
+        return 0;
+      }
+    return rep->empty() ? -1 : -2;
+  }
 
-inline bool matches(std::string line, std::string pat) {
-  return std::regex_match(line, std::regex(".*" + pat + ".*"));
-}
+  inline bool matches(std::string line, std::string pat) {
+    return std::regex_match(line, std::regex(".*" + pat + ".*"));
+  }
 
-inline std::string replace(std::string line, std::string pat, std::string rep) {
-  return std::regex_replace(line, std::regex("\\b" + pat), rep);
+  inline std::string replace(std::string line, std::string pat, std::string rep) {
+    return std::regex_replace(line, std::regex("\\b" + pat), rep);
+  }
 }
 
 namespace cmd {
