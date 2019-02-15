@@ -8,6 +8,10 @@ BIN_PATH = $(BUILD_PATH)/bin
 
 BOOST_PATH = /usr/include/boost
 IRCCLIENT_PATH = /usr/include/libircclient
+LIBCURL_PATH = $(shell curl-config --cflags)
+
+LIBCURL_LIBS = $(shell curl-config --libs)
+LIBIRCCLIENT_LIBS = -lircclient -lcrypto
 
 # Executable
 BIN_NAME = beep
@@ -28,8 +32,8 @@ DEPS = $(OBJS:.o=.d)
 WARN_FLAGS = -Wall -Wextra -Wshadow -Wfloat-equal -Wwrite-strings -Wswitch-default \
 						 -Wunreachable-code -Wno-unused-parameter -Wno-unused-function
 COMP_FLAGS = $(WARN_FLAGS) -std=c++17 -g
-INCLUDES = -I include/ -I $(IRCCLIENT_PATH) -I $(BOOST_PATH)
-LDLIBS = -lm -lircclient -lcrypto -lssl
+INCLUDES = -I include/ -I $(IRCCLIENT_PATH) -I $(BOOST_PATH) -I $(LIBCURL_PATH)
+LDLIBS = -lm -lircclient $(LIBIRCCLIENT_LIBS) $(LIBCURL_LIBS)
 
 # Cleaning command
 RM = rm -f
