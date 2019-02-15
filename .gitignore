@@ -8,6 +8,9 @@ capivara/
 build/*
 beep
 
+# Ctags
+tags
+
 # Prerequisites
 *.d
 
