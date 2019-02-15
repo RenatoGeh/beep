@@ -62,8 +62,8 @@ namespace utils {
     return user.substr(0, user.find("!"));
   }
 
-  std::vector<std::string> Tokenize(std::string s) {
-    boost::char_separator<char> sep(" ");
+  std::vector<std::string> Tokenize(std::string s, std::string sep_str) {
+    boost::char_separator<char> sep(sep_str.c_str());
     boost::tokenizer<boost::char_separator<char>> t(s, sep);
     std::vector<std::string> l;
     for (auto it = t.begin(); it != t.end(); ++it)

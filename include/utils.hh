@@ -71,7 +71,7 @@ namespace utils {
     return sprintf_internal(fmt, convert_str(std::forward<Args>(args))...);
   }
 
-  std::vector<std::string> Tokenize(std::string s);
+  std::vector<std::string> Tokenize(std::string s, std::string sep_str = " ");
 
   /* Date and time functions */
 
