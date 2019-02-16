@@ -8,6 +8,7 @@
 #include <curl/curl.h>
 #include <boost/property_tree/json_parser.hpp>
 
+#include "bot.hh"
 #include "utils.hh"
 #include "cmd/gitlab.hh"
 
@@ -58,7 +59,7 @@ namespace cmd {
 
     char *ptr = (char*) realloc(mem->memory, mem->size + realsize + 1);
     if (ptr == NULL) {
-      printf("Not enough memory (realloc returned NULL)\n");
+      utils::PrintError("Not enough memory (realloc returned NULL)");
       return 0;
     }
 
@@ -70,29 +71,46 @@ namespace cmd {
     return realsize;
   }
 
-  GitLab::GitLab(std::string gid) : Command("gl", "!gl",
-      "GitLab Request command.", "GitLab Request"), group_id(gid), handle(nullptr) {
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    handle = curl_easy_init();
+  CURL* GitLab::create_handle(int &err, struct GitLab::memchunk *buf) {
+    if (err) return nullptr;
+
+    CURL *handle = curl_easy_init();
 
     if (!handle) {
       utils::PrintError("Could not initialize libcurl.");
-      curl_global_cleanup();
-      error = 1;
-      return;
+      err = 1;
+      return nullptr;
     }
 
     curl_easy_setopt(handle, CURLOPT_HTTPGET, 1L);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void*)&buffer);
+    curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void*) buf);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, GitLab::write_data);
 
-    buffer.memory = (char*) malloc(1);
-    buffer.size = 0;
+    return handle;
+  }
+
+#define RESET_MEMCHUNK(mem) (mem).memory = (char*) malloc(1); \
+                            (mem).size = 0;
+
+  GitLab::GitLab(std::string gid) : Command("gl", "!gl",
+      "GitLab Request command.", "GitLab Request"), group_id(gid), handle(nullptr) {
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    handle = create_handle(error, &buffer);
+    uhandle = create_handle(error, &ubuffer);
+    if (error) {
+      curl_global_cleanup();
+      return;
+    }
+
+    RESET_MEMCHUNK(buffer);
+    RESET_MEMCHUNK(ubuffer);
   }
 
   GitLab::~GitLab(void) {
     if (!error) {
       curl_easy_cleanup(handle);
+      curl_easy_cleanup(uhandle);
       curl_global_cleanup();
       free(buffer.memory);
     }
@@ -113,32 +131,78 @@ namespace cmd {
     return "";
   }
 
-  std::string GitLab::do_any(std::string t, const std::vector<std::string> &params) {
-    std::string url = query(group_id, t, params);
-    curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
-
+  boost::property_tree::ptree* GitLab::curl_to_pt(const std::string &url,
+                                                  CURL* h,
+                                                  struct GitLab::memchunk *b) {
+    curl_easy_setopt(h, CURLOPT_URL, url.c_str());
     CURLcode res;
-    res = curl_easy_perform(handle);
+    res = curl_easy_perform(h);
     if (res != CURLE_OK)
       utils::PrintError("Unable to GET GitLab request (curl_easy_perform failed).");
+    return parse_json(b->memory);
+  }
 
-    boost::property_tree::ptree *pt = parse_json(buffer.memory);
-    t.pop_back();
+namespace {
+  std::string iterate_over(boost::property_tree::ptree *pt,
+                           std::function<std::string(boost::property_tree::ptree&)> f) {
     std::string quote;
     int n = 0;
     for (auto it = pt->begin(); it != pt->end() && n < GITLAB_MAX_ENTRIES; ++n) {
       auto c = it->second;
-      quote += utils::Sprintf("%s: %s (%s)", utils::toupper(t),
-          c.get<std::string>("title").c_str(),
-          c.get<std::string>("web_url").c_str());
+      quote += f(c);
       if (++it != pt->end() && n+1 < GITLAB_MAX_ENTRIES)
         quote += "\n";
     }
+    return quote;
+  }
+}
+
+  std::string GitLab::do_any(std::string t, const std::vector<std::string> &params) {
+    std::string url = query(group_id, t, params);
+    curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+    boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, handle, &buffer);
+    t.pop_back();
+    std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
+        return utils::Sprintf("%s: %s (%s)", utils::toupper(t),
+          c.get<std::string>("title").c_str(),
+          c.get<std::string>("web_url").c_str());
+      }
+    );
     delete pt;
     free(buffer.memory);
-    buffer.memory = (char*) malloc(1);
-    buffer.size = 0;
+    RESET_MEMCHUNK(buffer);
 
     return quote;
+  }
+
+  std::string GitLab::query_and_parse(const std::string &group_id, std::string type,
+      const std::string &stamp, CURL *hdl, struct GitLab::memchunk *buf) {
+    std::string url = query(group_id, type, std::vector<std::string> {stamp});
+    boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, hdl, buf);
+    type.pop_back();
+    std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
+        bool new_obj = c.get<std::string>("created_at") == c.get<std::string>("updated_at");
+        return utils::Sprintf("%s: %s: %s (%s)",
+            new_obj ? "NEW" : "UPDATED",
+            utils::toupper(type),
+            c.get<std::string>("title").c_str(),
+            c.get<std::string>("web_url").c_str());
+      }
+    );
+    delete pt;
+    return quote;
+  }
+
+  void GitLab::Update(void *arg) {
+    Bot *b = static_cast<Bot*>(arg);
+    chronos::Time now;
+    std::string stamp = "updated_after=" + last_update.Format("%FT%T");
+    b->Broadcast(query_and_parse(group_id, "issues", stamp, uhandle, &ubuffer));
+    free(ubuffer.memory);
+    RESET_MEMCHUNK(ubuffer);
+    b->Broadcast(query_and_parse(group_id, "merge_requests", stamp, uhandle, &ubuffer));
+    free(ubuffer.memory);
+    RESET_MEMCHUNK(ubuffer);
+    last_update = now;
   }
 }
