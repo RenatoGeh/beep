@@ -33,7 +33,7 @@ WARN_FLAGS = -Wall -Wextra -Wshadow -Wfloat-equal -Wwrite-strings -Wswitch-defau
 						 -Wunreachable-code -Wno-unused-parameter -Wno-unused-function
 COMP_FLAGS = $(WARN_FLAGS) -std=c++17 -g
 INCLUDES = -I include/ -I $(IRCCLIENT_PATH) -I $(BOOST_PATH) -I $(LIBCURL_PATH)
-LDLIBS = -lm -lircclient $(LIBIRCCLIENT_LIBS) $(LIBCURL_LIBS)
+LDLIBS = -lm $(LIBIRCCLIENT_LIBS) $(LIBCURL_LIBS) -pthread
 
 # Cleaning command
 RM = rm -f
