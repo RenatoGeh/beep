@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include <chrono>
 
 #include "libircclient.h"
 #include "libirc_rfcnumeric.h"
@@ -10,6 +11,7 @@
 #include "instant_log.hh"
 #include "utils.hh"
 #include "io.hh"
+#include "timer.hh"
 
 #include "cmd/listener.hh"
 #include "cmd/help.hh"
@@ -30,6 +32,7 @@ Capivara::Capivara(void) : Bot("capivara") {
   db = new UserBase("capivara/users");
 
   leave = new cmd::Leave();
+  cmd::GitLab *gl = new cmd::GitLab("3482579");
   cmd::Help *h = new cmd::Help({
       new cmd::Echo(),
       leave,
@@ -37,12 +40,16 @@ Capivara::Capivara(void) : Bot("capivara") {
       new cmd::Register(db),
       new cmd::Smiley(),
       new cmd::Substitute(logs),
-      new cmd::GitLab("3482579"),
+      gl,
   });
   listener = new cmd::Listener(h->Commands());
+
+  timer.Initialize(this, std::chrono::seconds(10), std::chrono::seconds(1));
+  timer.Push(gl);
 }
 
 Capivara::~Capivara(void) {
+  timer.Stop();
   delete logs;
   delete debug;
   delete listener;
@@ -65,6 +72,7 @@ void Capivara::OnConnect(void) {
   if (Join("#capivara-test")) return;
   Broadcast("Hi! I'm a capivara, and I'm a bot. See my code at (https://github.com/renatogeh/beep).");
   Broadcast("Use !help for a list of available commands.");
+  timer.Start();
 }
 
 void Capivara::OnMessage(std::string user, std::string channel, std::string text) {
