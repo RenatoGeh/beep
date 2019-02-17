@@ -38,9 +38,11 @@ namespace cmd {
       static boost::property_tree::ptree* curl_to_pt(const std::string &url, CURL* h,
           struct GitLab::memchunk *b);
       static std::string query_and_parse(const std::string &group_id, std::string type,
-          const std::string &stamp, CURL *hdl, struct GitLab::memchunk *buf);
+          const std::string &stamp, CURL *hdl, struct GitLab::memchunk *buf,
+          const std::string &name_tag = "title");
 
-      std::string do_any(std::string t, const std::vector<std::string> &params);
+      std::string do_any(std::string t, const std::vector<std::string> &params,
+          const std::string &name_tag = "title");
   };
 }
 

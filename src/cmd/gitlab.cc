@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include <sstream>
 #include <string>
 #include <vector>
@@ -120,7 +118,7 @@ namespace cmd {
     if (params.size() <= 3) return "";
     std::string command = params.at(3);
     std::vector<std::string> opts = std::vector<std::string>(params.begin()+4, params.end());
-    if (opts.empty())
+    if (command != "projects" && opts.empty())
       opts.push_back("state=opened");
     else
       opts.erase(std::remove_if(opts.begin(), opts.end(), insane), opts.end());
@@ -128,6 +126,8 @@ namespace cmd {
       return do_any("issues", opts);
     else if (command == "mr")
       return do_any("merge_requests", opts);
+    else if (command == "projects")
+      return do_any("projects", opts, "name");
     return "";
   }
 
@@ -149,7 +149,8 @@ namespace {
     int n = 0;
     for (auto it = pt->begin(); it != pt->end() && n < GITLAB_MAX_ENTRIES; ++n) {
       auto c = it->second;
-      quote += f(c);
+      std::string res = f(c);
+      if (!res.empty()) quote += f(c);
       if (++it != pt->end() && n+1 < GITLAB_MAX_ENTRIES)
         quote += "\n";
     }
@@ -157,14 +158,15 @@ namespace {
   }
 }
 
-  std::string GitLab::do_any(std::string t, const std::vector<std::string> &params) {
+  std::string GitLab::do_any(std::string t, const std::vector<std::string> &params,
+      const std::string &name_tag) {
     std::string url = query(group_id, t, params);
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
     boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, handle, &buffer);
     t.pop_back();
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
         return utils::Sprintf("%s: %s (%s)", utils::toupper(t),
-          c.get<std::string>("title").c_str(),
+          c.get<std::string>(name_tag).c_str(),
           c.get<std::string>("web_url").c_str());
       }
     );
@@ -176,16 +178,20 @@ namespace {
   }
 
   std::string GitLab::query_and_parse(const std::string &group_id, std::string type,
-      const std::string &stamp, CURL *hdl, struct GitLab::memchunk *buf) {
+      const std::string &stamp, CURL *hdl, struct GitLab::memchunk *buf,
+      const std::string &name_tag) {
     std::string url = query(group_id, type, std::vector<std::string> {stamp});
     boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, hdl, buf);
     type.pop_back();
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
-        bool new_obj = c.get<std::string>("created_at") == c.get<std::string>("updated_at");
+        std::string created_at = c.get("created_at", "");
+        std::string updated_at = c.get("updated_at", "");
+        if (created_at.empty() || updated_at.empty()) return "";
+        bool new_obj = created_at == updated_at;
         return utils::Sprintf("%s: %s: %s (%s)",
             new_obj ? "NEW" : "UPDATED",
             utils::toupper(type),
-            c.get<std::string>("title").c_str(),
+            c.get<std::string>(name_tag).c_str(),
             c.get<std::string>("web_url").c_str());
       }
     );
@@ -194,15 +200,17 @@ namespace {
   }
 
   void GitLab::Update(void *arg) {
+
+#define QUERY_PARSE_AND_RESET(t) b->Broadcast(query_and_parse(group_id, t, stamp, uhandle, &ubuffer)); \
+                                 free(ubuffer.memory); \
+                                 RESET_MEMCHUNK(ubuffer);
+
     Bot *b = static_cast<Bot*>(arg);
     chronos::Time now;
-    std::string stamp = "updated_after=" + last_update.Format("%FT%T");
-    b->Broadcast(query_and_parse(group_id, "issues", stamp, uhandle, &ubuffer));
-    free(ubuffer.memory);
-    RESET_MEMCHUNK(ubuffer);
-    b->Broadcast(query_and_parse(group_id, "merge_requests", stamp, uhandle, &ubuffer));
-    free(ubuffer.memory);
-    RESET_MEMCHUNK(ubuffer);
+    std::string stamp = "updated_after=" + last_update.Format("%FT%T", true);
+    QUERY_PARSE_AND_RESET("issues");
+    QUERY_PARSE_AND_RESET("merge_requests");
+    QUERY_PARSE_AND_RESET("projects");
     last_update = now;
   }
 }
