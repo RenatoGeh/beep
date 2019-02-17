@@ -25,9 +25,10 @@ namespace chronos {
 
   Time::Time(std::string stime) { Import(stime); }
 
-  std::string Time::Format(std::string fmt) {
+  std::string Time::Format(std::string fmt, bool utc) {
     char buf[256];
-    strftime(buf, 256, fmt.c_str(), localtime(&raw));
+    struct tm *t = utc ? gmtime(&raw) : localtime(&raw);
+    strftime(buf, 256, fmt.c_str(), t);
     return std::string(buf);
   }
 

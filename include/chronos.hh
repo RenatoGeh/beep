@@ -14,7 +14,7 @@ namespace chronos {
       // Creates a new Time importing a timestamp from a string.
       Time(std::string stime);
       // Format returns a string according to the strftime format.
-      std::string Format(std::string fmt);
+      std::string Format(std::string fmt, bool utc = false);
       // The operator- overload measures the duration between this Time and the given Time.
       double operator-(const Time &t);
       // Import imports a timestamp in string format. Requires POSIX.
