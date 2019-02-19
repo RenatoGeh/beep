@@ -53,9 +53,11 @@ namespace utils {
 
   namespace {
     template<typename T> auto convert_str(T&& t) {
+#if __GNUC__ >= 7
       if constexpr(std::is_same<std::remove_cv_t<std::remove_reference_t<T>>, std::string>::value)
         return std::forward<T>(t).c_str();
       else
+#endif
         return std::forward<T>(t);
     }
 
