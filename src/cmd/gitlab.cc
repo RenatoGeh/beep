@@ -163,6 +163,7 @@ namespace {
     std::string url = query(group_id, t, params);
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
     boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, handle, &buffer);
+    if (!pt) return "";
     t.pop_back();
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
         return utils::Sprintf("%s: %s (%s)", utils::toupper(t),
@@ -182,6 +183,7 @@ namespace {
       const std::string &name_tag) {
     std::string url = query(group_id, type, std::vector<std::string> {stamp});
     boost::property_tree::ptree *pt = GitLab::curl_to_pt(url, hdl, buf);
+    if (!pt) return "";
     type.pop_back();
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
         std::string created_at = c.get("created_at", "");
