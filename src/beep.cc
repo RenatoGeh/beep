@@ -5,15 +5,24 @@
 #include "bot.hh"
 #include "capivara.hh"
 
-int main(void) {
-  Capivara b;
-  Bot::Assign(&b);
+int main(int argc, char *args[]) {
+  Capivara *b;
+  if (argc == 3)
+    b = new Capivara(args[1], args[2], args[3]);
+  else if (argc == 2)
+    b = new Capivara(args[1], args[2]);
+  else
+    b = new Capivara();
+
+  Bot::Assign(b);
 
   puts("Connecting...");
-  b.Connect();
+  b->Connect();
   puts("Starting...");
-  b.Start();
+  b->Start();
   puts("Goodbye.");
+
+  delete b;
 
   return 0;
 }

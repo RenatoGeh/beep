@@ -26,7 +26,9 @@ class Capivara : public Bot {
 
     int Connect(void) { return Bot::Connect("irc.freenode.net"); }
 
-    Capivara(void);
+    Capivara(void) : Capivara("capivara", "#capivara-test") {}
+    Capivara(const std::string &name, const std::string &def_chan,
+        const std::string &gid = "3482579");
     ~Capivara(void);
 
   private:

@@ -25,14 +25,15 @@
 
 #include "capivara.hh"
 
-Capivara::Capivara(void) : Bot("capivara") {
-  io::Mkdir("capivara");
-  logs = new InstantLog("capivara/backlog.txt");
-  debug = new InstantLog("capivara/debug.txt");
-  db = new UserBase("capivara/users");
+Capivara::Capivara(const std::string &bname, const std::string &def_chan, const std::string &gid)
+  : Bot(bname.c_str()) {
+  io::Mkdir(bname);
+  logs = new InstantLog(bname + "/backlog.txt");
+  debug = new InstantLog(bname + "/debug.txt");
+  db = new UserBase(bname + "/users");
 
   leave = new cmd::Leave();
-  cmd::GitLab *gl = new cmd::GitLab("3482579");
+  cmd::GitLab *gl = new cmd::GitLab(gid);
   cmd::Help *h = new cmd::Help({
       new cmd::Echo(),
       leave,
