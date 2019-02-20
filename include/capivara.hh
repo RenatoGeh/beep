@@ -36,6 +36,7 @@ class Capivara : public Bot {
     InstantLog *debug;
     UserBase *db;
     Timer timer;
+    std::string chan;
 
     cmd::Listener *listener;
     cmd::Leave *leave;

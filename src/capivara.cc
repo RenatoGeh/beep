@@ -26,7 +26,7 @@
 #include "capivara.hh"
 
 Capivara::Capivara(const std::string &bname, const std::string &def_chan, const std::string &gid)
-  : Bot(bname.c_str()) {
+  : Bot(bname.c_str()), chan(def_chan) {
   io::Mkdir(bname);
   logs = new InstantLog(bname + "/backlog.txt");
   debug = new InstantLog(bname + "/debug.txt");
@@ -70,9 +70,7 @@ int Capivara::Whisper(std::string msg, std::string user) {
 }
 
 void Capivara::OnConnect(void) {
-  if (Join("#capivara-test")) return;
-  Broadcast("Hi! I'm a capivara, and I'm a bot. See my code at (https://github.com/renatogeh/beep).");
-  Broadcast("Use !help for a list of available commands.");
+  if (Join(chan)) return;
   timer.Start();
 }
 

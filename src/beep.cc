@@ -7,9 +7,9 @@
 
 int main(int argc, char *args[]) {
   Capivara *b;
-  if (argc == 3)
+  if (argc == 4)
     b = new Capivara(args[1], args[2], args[3]);
-  else if (argc == 2)
+  else if (argc == 3)
     b = new Capivara(args[1], args[2]);
   else
     b = new Capivara();
