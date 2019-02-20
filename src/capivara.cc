@@ -45,7 +45,7 @@ Capivara::Capivara(const std::string &bname, const std::string &def_chan, const 
   });
   listener = new cmd::Listener(h->Commands());
 
-  timer.Initialize(this, std::chrono::seconds(10), std::chrono::seconds(1));
+  timer.Initialize(this, std::chrono::hours(1), std::chrono::minutes(1));
   timer.Push(gl);
 }
 
