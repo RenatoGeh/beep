@@ -21,7 +21,7 @@ namespace {
     try {
       boost::property_tree::read_json(ss, *pt);
     } catch (boost::property_tree::json_parser::json_parser_error &exc) {
-      utils::PrintError("Unable to parse JSON.");
+      utils::PrintfError("Unable to parse JSON: %s\n", exc.what());
       delete pt;
       pt = nullptr;
     }
