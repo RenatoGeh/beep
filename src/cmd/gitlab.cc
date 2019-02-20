@@ -29,7 +29,7 @@ namespace {
   }
 
   std::string query(std::string group_id, std::string type, const std::vector<std::string> &opts) {
-    std::string url = utils::Sprintf(GITLAB_URL "%s/%s?sort=desc", group_id, type);
+    std::string url = utils::Sprintf(GITLAB_URL "%s/%s?sort=desc", group_id.c_str(), type.c_str());
     for (auto it = opts.begin(); it != opts.end(); ++it)
       url += "&" + *it;
     return url;
@@ -166,7 +166,7 @@ namespace {
     if (!pt) return "";
     t.pop_back();
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
-        return utils::Sprintf("%s: %s (%s)", utils::toupper(t),
+        return utils::Sprintf("%s: %s (%s)", utils::toupper(t).c_str(),
           c.get<std::string>(name_tag).c_str(),
           c.get<std::string>("web_url").c_str());
       }
@@ -192,7 +192,7 @@ namespace {
         bool new_obj = created_at == updated_at;
         return utils::Sprintf("%s: %s: %s (%s)",
             new_obj ? "NEW" : "UPDATED",
-            utils::toupper(type),
+            utils::toupper(type).c_str(),
             c.get<std::string>(name_tag).c_str(),
             c.get<std::string>("web_url").c_str());
       }
