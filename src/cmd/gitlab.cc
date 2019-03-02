@@ -188,10 +188,11 @@ namespace {
     std::string quote = iterate_over(pt, [&](boost::property_tree::ptree &c) -> std::string {
         std::string created_at = c.get("created_at", "");
         std::string updated_at = c.get("updated_at", "");
-        if (created_at.empty() || updated_at.empty()) return "";
-        bool new_obj = created_at == updated_at;
+        std::string status_s = c.get("status", "");
+        if (created_at.empty() || updated_at.empty() || status_s.empty()) return "";
+        int obj_status = created_at == updated_at ? 0 : status_s == "closed" ? -1 : 1;
         return utils::Sprintf("%s: %s: %s (%s)",
-            new_obj ? "NEW" : "UPDATED",
+            !obj_status ? "NEW" : obj_status < 0 ? "CLOSED" : "UPDATED",
             utils::toupper(type).c_str(),
             c.get<std::string>(name_tag).c_str(),
             c.get<std::string>("web_url").c_str());
